@@ -52,7 +52,7 @@ const Register = () => {
   // Handle form submission
   const formSubmit: SubmitHandler<RegisterInputs> = async (formData) => {
     try {
-      let payload: any = {
+      const payload: any = {
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -70,6 +70,7 @@ const Register = () => {
         // Employees need a valid company ID
         if (!formData.company) {
           toast.error("Company ID is required for employee registration");
+          setError("Company ID is required for employee registration");
           return;
         }
         payload.company = formData.company;
