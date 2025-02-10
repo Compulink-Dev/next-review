@@ -155,7 +155,7 @@ const Register = () => {
           <div className="mt-4 text-center">
             <span>Already have an account? </span>
             <Link
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline text-sm font-bold"
               href={`/signin?callbackUrl=${callbackUrl}`}
             >
               Sign In
