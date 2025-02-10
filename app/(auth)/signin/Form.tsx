@@ -115,10 +115,10 @@ const LoginForm = () => {
             </form>
           </Form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-4">
             <span>Need an account? </span>
             <Link
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline text-sm font-bold"
               href={`/register?callbackUrl=${callbackUrl}`}
             >
               Register

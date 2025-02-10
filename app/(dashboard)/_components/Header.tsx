@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Bell, Mail } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 
-const Header = () => {
+const Header = ({ isSidebarOpen }: { isSidebarOpen: any }) => {
   const { data: session } = useSession();
 
   // Generate user initials from the session
@@ -30,7 +30,11 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-md px-6 py-4 flex items-center justify-between fixed top-0 right-0 left-64 z-50">
+    <header
+      className={`bg-white shadow-md px-6 py-4 flex items-center justify-between fixed top-0 right-0 ${
+        isSidebarOpen ? "left-48" : "left-20"
+      } z-50`}
+    >
       {/* Search Bar */}
       <div className="flex-1">
         <Input
@@ -41,7 +45,7 @@ const Header = () => {
       </div>
 
       {/* Icons and User Profile */}
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-2">
         {/* Mail Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

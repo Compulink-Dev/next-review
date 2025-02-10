@@ -5,8 +5,8 @@ interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: "admin" | "client" | "employee";
-  company: string; // Refers to the company they are associated with
+  role: "client" | "companyAdmin" | "employee";
+  company?: mongoose.Types.ObjectId;
 }
 
 const UserSchema: Schema = new Schema(
@@ -16,10 +16,10 @@ const UserSchema: Schema = new Schema(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["admin", "client", "employee"],
+      enum: ["client", "companyAdmin", "employee"],
       required: true,
     },
-    company: { type: String, required: true },
+    company: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
   },
   { timestamps: true }
 );

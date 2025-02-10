@@ -21,7 +21,7 @@ type RegisterInputs = {
   company: string;
 };
 const options = [
-  { label: "Admin", value: "admin" },
+  { label: "Company", value: "companyAdmin" },
   { label: "Client", value: "client" },
   { label: "Employee", value: "employee" },
 ];
@@ -52,12 +52,34 @@ const Register = () => {
   // Handle form submission
   const formSubmit: SubmitHandler<RegisterInputs> = async (formData) => {
     try {
-      await axios.post("/api/auth/register", formData);
+      let payload: any = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+      };
+
+      if (formData.role === "admin") {
+        // Admin must provide a company name
+        if (!formData.company) {
+          toast.error("Company name is required for admin registration");
+          return;
+        }
+        payload.company = formData.company;
+      } else if (formData.role === "employee") {
+        // Employees need a valid company ID
+        if (!formData.company) {
+          toast.error("Company ID is required for employee registration");
+          return;
+        }
+        payload.company = formData.company;
+      }
+
+      await axios.post("/api/auth/register", payload);
       toast.success("User registered successfully");
       router.push("/signin?registered=true"); // Redirect after registration
     } catch (error) {
-      toast.error(`Error registering user ${error}`);
-      setError("Error registering user");
+      toast.error(`Error registering user: ${error}`);
     }
   };
 
@@ -114,14 +136,24 @@ const Register = () => {
                 iconSrc="/icons/locks.svg"
               />
 
-              <CustomFormField
-                control={form.control}
-                name="company"
-                label="Company Name"
-                placeholder="Enter your company name"
-                fieldType={FormFieldType.INPUT}
-                iconSrc="/icons/company.svg"
-              />
+              {form.watch("role") !== "client" && (
+                <CustomFormField
+                  control={form.control}
+                  name="company"
+                  label={
+                    form.watch("role") === "admin"
+                      ? "Company Name"
+                      : "Company ID"
+                  }
+                  placeholder={
+                    form.watch("role") === "admin"
+                      ? "Enter your company name"
+                      : "Enter company ID"
+                  }
+                  fieldType={FormFieldType.INPUT}
+                  iconSrc="/icons/company.svg"
+                />
+              )}
 
               <CustomFormField
                 control={form.control}
@@ -152,7 +184,7 @@ const Register = () => {
             </form>
           </Form>
 
-          <div className="mt-4 text-center">
+          <div className="mt-4">
             <span>Already have an account? </span>
             <Link
               className="text-blue-600 hover:underline text-sm font-bold"

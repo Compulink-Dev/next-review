@@ -1,58 +1,70 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import { hash } from "bcryptjs";
 import dbConnect from "@/lib/database";
 import UserModel from "@/lib/models/User";
+import Company from "@/lib/models/Company";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    console.log("Received data:", body); // Debugging log
-
-    const { name, email, password, role, company } = body;
-
-    if (!name || !email || !password || !role || !company) {
-      console.error("Missing required fields");
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
-    }
-
-    await dbConnect(); // Ensure DB connection
+    await dbConnect();
+    const { name, email, password, role, company } = await req.json();
 
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      console.error("User already exists:", email);
       return NextResponse.json(
-        { message: "User already exists" },
+        { message: "Email already exists" },
         { status: 400 }
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await hash(password, 10);
 
-    const newUser = new UserModel({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      company,
-    });
-
-    await newUser.save();
+    let newUser;
+    if (role === "admin") {
+      // Register a company admin and create the company
+      const newCompany = await Company.create({ name: company });
+      newUser = await UserModel.create({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        company: newCompany._id,
+      });
+      newCompany.admin = newUser._id;
+      await newCompany.save();
+    } else if (role === "employee") {
+      // Ensure company exists before registering employee
+      const existingCompany = await Company.findById(company);
+      if (!existingCompany) {
+        return NextResponse.json(
+          { message: "Company not found" },
+          { status: 400 }
+        );
+      }
+      newUser = await UserModel.create({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        company: existingCompany._id,
+      });
+      existingCompany.employees.push(newUser._id);
+      await existingCompany.save();
+    } else {
+      // Register clients without a company
+      newUser = await UserModel.create({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+      });
+    }
 
     return NextResponse.json(
-      { message: "User created successfully" },
+      { message: "User registered successfully", user: newUser },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error creating user:", error);
-    return NextResponse.json(
-      {
-        message: "Error creating user",
-        error: error instanceof Error ? error.message : error,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: error }, { status: 500 });
   }
 }

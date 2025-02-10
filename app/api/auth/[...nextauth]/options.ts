@@ -28,7 +28,7 @@ export const options: NextAuthOptions = {
               id: user._id.toString(),
               email: user.email,
               role: user.role,
-              company: user.company,
+              company: user.company || null,
               name: user.name, // Ensure 'name' is included here
             };
           }

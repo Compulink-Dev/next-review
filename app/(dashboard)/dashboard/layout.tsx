@@ -14,14 +14,22 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Sidebar */}
       <aside
         className={`${
-          isSidebarOpen ? "w-64" : "w-20"
+          isSidebarOpen ? "w-48" : "w-20"
         } transition-all duration-300 bg-white shadow-md flex flex-col fixed inset-y-0 left-0`}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b">
-          <Image src="/icons/logo.png" alt="Logo" width={40} height={40} />
+          {isSidebarOpen ? (
+            <Image src="/icons/logo.png" alt="Logo" width={40} height={40} />
+          ) : (
+            ""
+          )}
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            {isSidebarOpen ? (
+              <X size={20} className="text-slate-700" />
+            ) : (
+              <Menu className="ml-2 text-slate-700" size={20} />
+            )}
           </button>
         </div>
 
@@ -30,12 +38,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col ml-64">
+      <div
+        className={`flex-1 flex flex-col ${isSidebarOpen ? "ml-40" : "ml-12"} `}
+      >
         {/* Header */}
-        <Header />
+        <Header isSidebarOpen={isSidebarOpen} />
 
         {/* Scrollable Main Section */}
-        <main className="flex-1 overflow-y-auto p-6 mt-16">{children}</main>
+        <main className="flex-1 overflow-y-auto p-12 mt-12">{children}</main>
       </div>
     </div>
   );

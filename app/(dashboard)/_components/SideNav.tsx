@@ -11,73 +11,79 @@ function SideNav({ isSidebarOpen }: { isSidebarOpen: any }) {
             href="/dashboard"
             className="flex items-center p-3 text-gray-700 rounded-md hover:bg-gray-200"
           >
-            <span
-              className={`${
-                isSidebarOpen ? "block" : "hidden"
-              } ml-2 flex items-center gap-2`}
-            >
+            <span className="flex items-center gap-2">
               <LayoutDashboard size={16} />
-              <p className="">Dashboard</p>
+              <p className={`${isSidebarOpen ? "block" : "hidden"} ml-2 `}>
+                Dashboard
+              </p>
             </span>
           </Link>
         </li>
         <li>
           <Link
-            href="/settings"
+            href="/dashboard/employees"
             className="flex items-center p-3 text-gray-700 rounded-md hover:bg-gray-200"
           >
-            <span
-              className={`${
-                isSidebarOpen ? "block" : "hidden"
-              } ml-2 flex items-center gap-2`}
-            >
+            <span className="flex items-center gap-2">
               <User size={16} />
-              <p className="">Employees</p>
+              <p
+                className={`${
+                  isSidebarOpen ? "block" : "hidden"
+                } ml-2 flex items-center gap-2`}
+              >
+                Employees
+              </p>
             </span>
           </Link>
         </li>
         <li>
           <Link
-            href="/settings"
+            href="/dashboard/reviews"
             className="flex items-center p-3 text-gray-700 rounded-md hover:bg-gray-200"
           >
-            <span
-              className={`${
-                isSidebarOpen ? "block" : "hidden"
-              } ml-2 flex items-center gap-2`}
-            >
+            <span className="flex items-center gap-2">
               <Star size={16} />
-              <p className="">Review</p>
+              <p
+                className={`${
+                  isSidebarOpen ? "block" : "hidden"
+                } ml-2 flex items-center gap-2`}
+              >
+                Reviews
+              </p>
             </span>
           </Link>
         </li>
         <li>
           <Link
-            href="/settings"
+            href="/dashboard/feedback"
             className="flex items-center p-3 text-gray-700 rounded-md hover:bg-gray-200"
           >
-            <span
-              className={`${
-                isSidebarOpen ? "block" : "hidden"
-              } ml-2 flex items-center gap-2`}
-            >
+            <span className="flex items-center gap-2">
               <History size={16} />
-              <p className="">Feedback</p>
+              <p
+                className={`${
+                  isSidebarOpen ? "block" : "hidden"
+                } ml-2 flex items-center gap-2`}
+              >
+                Feedback
+              </p>
             </span>
           </Link>
         </li>
         <li>
           <Link
-            href="/settings"
+            href="/dashboard/settings"
             className="flex items-center p-3 text-gray-700 rounded-md hover:bg-gray-200"
           >
-            <span
-              className={`${
-                isSidebarOpen ? "block" : "hidden"
-              } ml-2 flex items-center gap-2`}
-            >
+            <span className="flex items-center gap-2">
               <Settings size={16} />
-              <p className="">Settings</p>
+              <p
+                className={`${
+                  isSidebarOpen ? "block" : "hidden"
+                } ml-2 flex items-center gap-2`}
+              >
+                Settings
+              </p>
             </span>
           </Link>
         </li>
