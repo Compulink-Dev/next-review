@@ -1,198 +1,103 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import axios from "axios";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useSession } from "next-auth/react";
-import { Building, Globe, LocateFixed, Mail, Phone, Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Title from "@/components/Title";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import BackButton from "@/components/BackButton";
 
+// Company and Employee Types
 type Company = {
   _id: string;
   name: string;
   email: string;
-  website?: string;
+  service?: string;
   phone?: string;
-  imageUrl?: string;
-  service?: string[];
   address?: string;
-  category?: string[];
   description?: string;
 };
 
-function Company() {
-  const { data: session } = useSession();
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [open, setOpen] = useState(false);
-  const router = useRouter();
-  const { register, handleSubmit, reset } = useForm();
+type Employee = {
+  _id: string;
+  name: string;
+  email: string;
+  position?: string;
+};
+
+function CompanyDetails() {
+  const { id } = useParams() as { id: string };
+  const [company, setCompany] = useState<Company | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCompanies = async () => {
+    const fetchCompany = async () => {
       try {
-        const res = await axios.get("/api/company");
-        setCompanies(res.data);
+        const response = await axios.get(`/api/company/${id}`);
+        setCompany(response.data.company);
+        setEmployees(response.data.employees);
       } catch (error) {
-        console.error("Error fetching companies:", error);
+        console.error("Failed to fetch company details:", error);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchCompanies();
-  }, []);
 
-  const onSubmit = async (data: any) => {
-    try {
-      const res = await axios.post("/api/auth/register/company", data);
-      if (res.status === 201) {
-        setOpen(false);
-        reset();
-        setCompanies((prev: Company[]) => [...prev, res.data.company]);
-      }
-    } catch (error) {
-      console.error("Failed to add company:", error);
-    }
-  };
+    if (id) fetchCompany();
+  }, [id]);
+
+  if (loading) return <p>Loading company details...</p>;
+  if (!company) return <p>No company found.</p>;
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <Title
-          title="Companies"
-          subtitle="View all the companies on this platform"
-        />
-
-        {session?.user.role === "admin" && (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="text-color border border-color">
-                <Plus />
-                <p className="ml-2">Add Company</p>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-white">
-              <DialogHeader>
-                <DialogTitle>Add Company</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="flex gap-2 items-center">
-                  <div className="w-full">
-                    <Label htmlFor="name">Company Name</Label>
-                    <Input
-                      id="name"
-                      {...register("name", { required: true })}
-                    />
-                  </div>
-                  <div className="w-full">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      {...register("email", { required: true })}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    {...register("password", { required: true })}
-                  />
-                </div>
-                <div className="flex gap-2 items-center">
-                  <div className="w-full">
-                    <Label htmlFor="website">Website</Label>
-                    <Input id="website" {...register("website")} />
-                  </div>
-                  <div className="w-full">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input id="phone" {...register("phone")} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-full">
-                    <Label htmlFor="imageUrl">Image URL</Label>
-                    <Input id="imageUrl" {...register("imageUrl")} />
-                  </div>
-                  <div className="w-full">
-                    <Label htmlFor="service">Service</Label>
-                    <Input id="service" {...register("service")} />
-                  </div>
-                </div>
-                <div className="flex gap-2 items-center w-full">
-                  <div className="w-full">
-                    <Label htmlFor="address">Address</Label>
-                    <Input id="address" {...register("address")} />
-                  </div>
-                  <div className="w-full">
-                    <Label htmlFor="category">Category</Label>
-                    <Input id="category" {...register("category")} />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Input id="description" {...register("description")} />
-                </div>
-
-                <Button type="submit" className="w-full bg-color text-white">
-                  Add Company
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        )}
+      <div className="flex items-center justify-between">
+        <Title title={company.name} />
+        <BackButton />
       </div>
-      <Title title="All Companies" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        {companies.map((company) => (
-          <div
-            key={company._id}
-            onClick={() => router.push(`/dashboard/company/${company._id}`)}
-            className="p-8 border cursor-pointer rounded flex bg-slate-50 shadow-lg hover:bg-color hover:text-white items-center gap-4 text-color delay-100"
-          >
-            <div className="">
-              <Building size={40} />
-            </div>
-            <Separator orientation="vertical" className="bg-red-700" />
-            <div className="">
-              <p className="font-bold">{company.name}</p>
-              <p className="text-xs">{company.service}</p>
-
-              <div className="mt-4 space-y-2">
-                <div className="flex gap-2 items-center">
-                  <Phone size={12} />
-                  <p className="text-xs">{company.phone}</p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Mail size={12} />
-                  <p className="text-xs">{company.email}</p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Globe size={12} />
-                  <p className="text-xs">{company.website}</p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <LocateFixed size={12} />
-                  <p className="text-xs">{company.address}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="mt-6 space-y-4">
+        <p>
+          <strong>Email:</strong> {company.email}
+        </p>
+        <p>
+          <strong>Service:</strong> {company.service}
+        </p>
+        <p>
+          <strong>Phone:</strong> {company.phone}
+        </p>
+        <p>
+          <strong>Address:</strong> {company.address}
+        </p>
+        <p>
+          <strong>Description:</strong> {company.description}
+        </p>
+      </div>
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold mb-4">Employees</h2>
+        {employees.length > 0 ? (
+          <ul className="space-y-2">
+            {employees.map((emp) => (
+              <li key={emp._id} className="p-4 border rounded-lg bg-gray-50">
+                <p>
+                  <strong>Name:</strong> {emp.name}
+                </p>
+                <p>
+                  <strong>Email:</strong> {emp.email}
+                </p>
+                {emp.position && (
+                  <p>
+                    <strong>Position:</strong> {emp.position}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No employees registered under this company.</p>
+        )}
       </div>
     </div>
   );
 }
 
-export default Company;
+export default CompanyDetails;
