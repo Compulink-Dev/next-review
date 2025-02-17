@@ -15,7 +15,7 @@ const Dashboard = async () => {
     <div className="">
       <Title
         title="Dashboard"
-        subtitle="Here is where you can manage your settings and view insights."
+        subtitle="Here is where you can manage your settings and view insights"
       />
 
       {/* Example Long Content for Scrolling */}
