@@ -26,16 +26,21 @@ const navLinks = [
     name: "Company",
     href: "/dashboard/company",
     icon: Building,
-    roles: ["employee", "companyAdmin"],
+    roles: ["employee", "companyAdmin", "client"],
   },
   { name: "Reviews", href: "/dashboard/reviews", icon: Star },
   {
     name: "Notifications",
     href: "/dashboard/notifications",
     icon: AlertCircle,
+    roles: ["employee", "companyAdmin", "client"],
+  },
+  {
+    name: "Messages",
+    href: "/dashboard/messages",
+    icon: MessageCircle,
     roles: ["employee", "companyAdmin"],
   },
-  { name: "Messages", href: "/dashboard/messages", icon: MessageCircle },
   {
     name: "Feedback",
     href: "/dashboard/feedback",
@@ -46,13 +51,13 @@ const navLinks = [
     name: "Profile",
     href: "/dashboard/profile",
     icon: User,
-    roles: ["employee", "companyAdmin"],
+    roles: ["employee", "companyAdmin", "client"],
   },
   {
     name: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
-    roles: ["employee", "companyAdmin"],
+    roles: ["employee", "companyAdmin", "client"],
   },
 ];
 
