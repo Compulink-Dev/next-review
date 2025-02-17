@@ -17,8 +17,8 @@ import Title from "@/components/Title";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useSession } from "next-auth/react";
 
-// Review Type
 type Review = {
   _id: string;
   employeeName: string;
@@ -30,12 +30,12 @@ type Review = {
 };
 
 function Reviews() {
+  const { data: session } = useSession();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const { register, handleSubmit, reset } = useForm();
 
-  // Fetch Reviews
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -48,7 +48,6 @@ function Reviews() {
     fetchReviews();
   }, []);
 
-  // Submit New Review
   const onSubmit = async (data: any) => {
     try {
       const res = await axios.post("/api/reviews", data);
@@ -69,79 +68,80 @@ function Reviews() {
           title="Reviews"
           subtitle="Manage and view reviews on this platform"
         />
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="text-color border border-color">
-              <Plus />
-              <p className="ml-2">Add Review</p>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle>Add Review</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="flex gap-2 items-center">
-                <div className="w-full">
-                  <Label htmlFor="employeeName">Employee Name</Label>
-                  <Input
-                    id="employeeName"
-                    {...register("employeeName", { required: true })}
-                  />
-                </div>
-                <div className="w-full">
-                  <Label htmlFor="department">Department</Label>
-                  <Input
-                    id="department"
-                    {...register("department", { required: true })}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 items-center">
-                <div className="w-full">
-                  <Label htmlFor="clientName">Client Name</Label>
-                  <Input
-                    id="clientName"
-                    {...register("clientName", { required: true })}
-                  />
-                </div>
-                <div className="w-full">
-                  <Label htmlFor="date">Date</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    {...register("date", { required: true })}
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 items-center">
-                <div className="w-full">
-                  <Label htmlFor="rating">Rating (1-5)</Label>
-                  <Input
-                    id="rating"
-                    type="number"
-                    min="1"
-                    max="5"
-                    {...register("rating", { required: true })}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  {...register("description", { required: true })}
-                />
-              </div>
-              <Button type="submit" className="w-full bg-color text-white">
-                Add Review
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
 
-      {/* Display Reviews */}
+        {session?.user.role !== "employee" && (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="text-color border border-color">
+                <Plus />
+                <p className="ml-2">Add Review</p>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-white">
+              <DialogHeader>
+                <DialogTitle>Add Review</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="flex gap-2 items-center">
+                  <div className="w-full">
+                    <Label htmlFor="employeeName">Employee Name</Label>
+                    <Input
+                      id="employeeName"
+                      {...register("employeeName", { required: true })}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <Label htmlFor="department">Department</Label>
+                    <Input
+                      id="department"
+                      {...register("department", { required: true })}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <div className="w-full">
+                    <Label htmlFor="clientName">Client Name</Label>
+                    <Input
+                      id="clientName"
+                      {...register("clientName", { required: true })}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <Label htmlFor="date">Date</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      {...register("date", { required: true })}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <div className="w-full">
+                    <Label htmlFor="rating">Rating (1-5)</Label>
+                    <Input
+                      id="rating"
+                      type="number"
+                      min="1"
+                      max="5"
+                      {...register("rating", { required: true })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Input
+                    id="description"
+                    {...register("description", { required: true })}
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-color text-white">
+                  Add Review
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         {reviews.map((review, index) => (
           <div
@@ -149,11 +149,9 @@ function Reviews() {
             onClick={() => router.push(`/dashboard/reviews/${review._id}`)}
             className="p-6 border cursor-pointer rounded flex bg-slate-50 shadow-lg hover:bg-color hover:text-white items-center gap-4 text-color delay-100"
           >
-            <div className="">
-              <User size={40} />
-            </div>
+            <User size={40} />
             <Separator orientation="vertical" className="bg-red-700" />
-            <div className="">
+            <div>
               <p className="font-bold">{review.employeeName}</p>
               <p className="text-xs">Department: {review.department}</p>
               <p className="text-xs">Client: {review.clientName}</p>
@@ -175,7 +173,6 @@ function Reviews() {
                       className="text-gray-300"
                     />
                   ))}
-                  {/* <p className="text-xs">Rating: {review.rating}</p> */}
                 </div>
               </div>
             </div>
