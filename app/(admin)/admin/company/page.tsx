@@ -33,7 +33,6 @@ type Company = {
 };
 
 function Company() {
-  const { data: session } = useSession();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [open, setOpen] = useState(false);
   const router = useRouter();

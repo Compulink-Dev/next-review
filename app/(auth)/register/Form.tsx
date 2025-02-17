@@ -64,6 +64,7 @@ const Register = () => {
         const response = await axios.get("/api/company");
         setCompanies(response.data);
       } catch (error) {
+        console.log(error);
         toast.error("Failed to fetch companies");
       }
     };
@@ -102,6 +103,8 @@ const Register = () => {
       toast.error(`Error registering user: ${error}`);
     }
   };
+
+  console.log(error);
 
   return (
     <div className="flex h-full mb-8">

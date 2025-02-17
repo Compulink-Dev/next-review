@@ -68,6 +68,8 @@ const Employees = () => {
       reset();
       setOpen(false);
     } catch (error) {
+      console.log(error);
+
       toast.error("Failed to add employee");
     }
   };

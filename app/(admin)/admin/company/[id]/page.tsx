@@ -22,6 +22,8 @@ function CompanyDetails() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  console.log(employees);
+
   useEffect(() => {
     const fetchCompany = async () => {
       try {

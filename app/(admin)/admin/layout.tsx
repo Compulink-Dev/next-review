@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, Menu, X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Header from "../_components/Header";
 import SideNav from "../_components/SideNav";

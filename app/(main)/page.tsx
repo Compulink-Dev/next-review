@@ -1,5 +1,4 @@
 import React from "react";
-import Hero from "./_components/Hero";
 import Category from "./_components/Category";
 import Reviews from "./_components/Reviews";
 
