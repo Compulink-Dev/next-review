@@ -49,7 +49,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
   switch (props.fieldType) {
     case FormFieldType.INPUT:
       return (
-        <div className="flex rounded-md border border-[#e42424] bg-color">
+        <div className="flex rounded-md border border-[#e42424] bg-red-500">
           {props.iconSrc && (
             <Image
               src={props.iconSrc}
@@ -70,7 +70,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       );
     case FormFieldType.PASSWORD:
       return (
-        <div className="flex rounded-md border border-[#e42424] bg-color">
+        <div className="flex rounded-md border border-[#e42424] bg-red-500">
           {props.iconSrc && (
             <Image
               src={props.iconSrc}
@@ -132,7 +132,7 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       );
     case FormFieldType.DATE_PICKER:
       return (
-        <div className="flex rounded-md border border-[#e42424] bg-dark-400">
+        <div className="flex rounded-md border border-[#e42424] bg-red-500">
           <Image
             src="/icons/calendar.svg"
             height={24}

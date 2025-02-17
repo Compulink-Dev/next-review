@@ -53,6 +53,10 @@
     background-color: #960018;
   }
 
+  .border-color {
+    border-color: #960018;
+  }
+
   .text-color {
     color: #960018;
   }
@@ -212,15 +216,15 @@
   }
 
   .shad-input {
-    @apply placeholder:text-white text-sm border-[#abb8c4] h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
+    @apply placeholder:text-white text-sm border-red-700 h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
   }
 
   .shad-input-icon {
-    @apply bg-[#abb8c4] placeholder:text-dark-600 border-[#abb8c4] h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
+    @apply bg-color placeholder:text-dark-600 border-red-700 h-11 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
   }
 
   .shad-textArea {
-    @apply placeholder:text-dark-600 border-[#abb8c4] focus-visible:ring-0 focus-visible:ring-offset-0 !important;
+    @apply placeholder:text-dark-600 border-red-700 focus-visible:ring-0 focus-visible:ring-offset-0 !important;
   }
 
   .shad-combobox-item {
@@ -232,15 +236,15 @@
   }
 
   .shad-select-trigger {
-    @apply placeholder:text-green-600 border-[#abb8c4] h-11 focus:ring-0 focus:ring-offset-0 !important;
+    @apply placeholder:text-green-600 border-red-700 h-11 focus:ring-0 focus:ring-offset-0 !important;
   }
 
   .shad-select-content {
-    @apply bg-[#abb8c4] border-[#abb8c4] text-[#253237] !important;
+    @apply bg-red-500 border-red-700 !important;
   }
 
   .shad-dialog {
-    @apply bg-color border-[#abb8c4] !important;
+    @apply bg-color border-red-500 !important;
   }
 
   .shad-dialog button {

@@ -1,17 +1,23 @@
 import { options } from "@/app/api/auth/[...nextauth]/options";
+import Title from "@/components/Title";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 const Dashboard = async () => {
   const session = await getServerSession(options);
 
-  console.log("Session", session?.user?.role);
+  console.log("Session", session?.user?.company);
+
+  if (!session) {
+    redirect("/signin");
+  }
 
   return (
     <div className="">
-      <h2 className="text-2xl font-bold mb-4">Welcome to the Dashboard</h2>
-      <p className="text-gray-600">
-        Here is where you can manage your settings and view insights.
-      </p>
+      <Title
+        title="Dashboard"
+        subtitle="Here is where you can manage your settings and view insights."
+      />
 
       {session?.user?.role === "employee" && (
         <div className="mt-4 space-y-6">

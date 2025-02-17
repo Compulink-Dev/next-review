@@ -19,7 +19,6 @@ type Inputs = {
 const LoginForm = () => {
   const { data: session } = useSession();
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") || "/dashboard";
   const router = useRouter();
 
   const form = useForm<Inputs>({
@@ -29,10 +28,12 @@ const LoginForm = () => {
     },
   });
 
-  // Redirect if already logged in
+  // Redirect based on user role if already logged in
   useEffect(() => {
     if (session?.user) {
-      router.push("/dashboard");
+      const redirectPath =
+        session.user.role === "admin" ? "/admin" : "/dashboard";
+      router.push(redirectPath);
     }
   }, [session, router]);
 
@@ -48,17 +49,23 @@ const LoginForm = () => {
     if (result?.error) {
       console.error("Login failed:", result.error);
     } else {
-      router.push("/dashboard"); // Redirect manually after successful login
+      // Fetch session after login to check user role
+      const updatedSession = await fetch("/api/auth/session").then((res) =>
+        res.json()
+      );
+      const redirectPath =
+        updatedSession?.user?.role === "admin" ? "/admin" : "/dashboard";
+      router.push(redirectPath);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-red-100">
       <Card className="flex flex-row w-full max-w-3xl shadow-lg bg-white">
         {/* Left Side - Image */}
         <div className="w-1/2 relative hidden md:block">
           <Image
-            src="/icons/login.png" // Change this to your actual image path
+            src="/icons/login.png"
             layout="fill"
             objectFit="contain"
             alt="Login illustration"
@@ -88,9 +95,9 @@ const LoginForm = () => {
                 control={form.control}
                 name="email"
                 label="Email"
-                placeholder="Enter your mail"
+                placeholder="Enter your email"
                 fieldType={FormFieldType.INPUT}
-                iconSrc="/icons/email.svg" // Adjust path to actual icon
+                iconSrc="/icons/email.svg"
               />
 
               <CustomFormField
@@ -99,7 +106,7 @@ const LoginForm = () => {
                 label="Password"
                 placeholder="Enter your password"
                 fieldType={FormFieldType.PASSWORD}
-                iconSrc="/icons/locks.svg" // Adjust path to actual icon
+                iconSrc="/icons/locks.svg"
               />
 
               <Button
@@ -118,8 +125,8 @@ const LoginForm = () => {
           <div className="mt-4">
             <span>Need an account? </span>
             <Link
-              className="text-blue-600 hover:underline text-sm font-bold"
-              href={`/register?callbackUrl=${callbackUrl}`}
+              className="text-color hover:underline text-sm font-bold"
+              href={`/register`}
             >
               Register
             </Link>

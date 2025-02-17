@@ -41,35 +41,30 @@ function Header() {
         <nav>
           <ul className="flex items-center space-x-6 text-xs">
             <li>
-              <Link href="/" className="text-gray-800 hover:text-blue-500">
+              <Link href="/" className="text-white hover:text-red-600">
                 Home
               </Link>
             </li>
             <li>
-              <Link href="/about" className="text-gray-800 hover:text-blue-500">
+              <Link href="/about" className="text-white hover:text-red-600">
                 About
               </Link>
             </li>
             <li>
-              <Link
-                href="/services"
-                className="text-gray-800 hover:text-blue-500"
-              >
+              <Link href="/services" className="text-white hover:text-red-600">
                 Services
               </Link>
             </li>
             <li>
-              <Link
-                href="/contact"
-                className="text-gray-800 hover:text-blue-500"
-              >
+              <Link href="/contact" className="text-white hover:text-red-600">
                 Contact
               </Link>
             </li>
             <div className="flex items-center gap-2">
               <li>
                 <Button
-                  className="bg-color hover:bg-red-600 text-white"
+                  variant={"outline"}
+                  className="border-red-600 hover:bg-color text-white"
                   onClick={() => {
                     router.push("/signin");
                   }}

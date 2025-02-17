@@ -1,3 +1,4 @@
+// API Route: /api/auth/register
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import dbConnect from "@/lib/database";
@@ -7,7 +8,17 @@ import Company from "@/lib/models/Company";
 export async function POST(req: Request) {
   try {
     await dbConnect();
-    const { name, email, password, role, company } = await req.json();
+    const {
+      name,
+      email,
+      password,
+      role,
+      company,
+      phone,
+      address,
+      imageUrl,
+      status,
+    } = await req.json();
 
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
@@ -20,7 +31,7 @@ export async function POST(req: Request) {
     const hashedPassword = await hash(password, 10);
 
     let newUser;
-    if (role === "admin") {
+    if (role === "companyAdmin") {
       // Register a company admin and create the company
       const newCompany = await Company.create({ name: company });
       newUser = await UserModel.create({
@@ -29,6 +40,10 @@ export async function POST(req: Request) {
         password: hashedPassword,
         role,
         company: newCompany._id,
+        phone,
+        address,
+        imageUrl,
+        status: status || "inactive",
       });
       newCompany.admin = newUser._id;
       await newCompany.save();
@@ -47,6 +62,10 @@ export async function POST(req: Request) {
         password: hashedPassword,
         role,
         company: existingCompany._id,
+        phone,
+        address,
+        imageUrl,
+        status: status || "inactive",
       });
       existingCompany.employees.push(newUser._id);
       await existingCompany.save();
@@ -57,6 +76,10 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         role,
+        phone,
+        address,
+        imageUrl,
+        status: status || "inactive",
       });
     }
 

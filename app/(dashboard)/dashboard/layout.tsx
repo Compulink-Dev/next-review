@@ -1,13 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Image from "next/image";
 import Header from "../_components/Header";
 import SideNav from "../_components/SideNav";
+import { useSession } from "next-auth/react";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { data: session } = useSession(); // Get session data
+
+  console.log("Session : ", session);
+
+  const userRole = session?.user?.role ?? "client"; // Default to client if undefined
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -18,7 +24,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         } transition-all duration-300 bg-white shadow-md flex flex-col fixed inset-y-0 left-0`}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center justify-between p-[14px] border-b border-color">
           {isSidebarOpen ? (
             <Image src="/icons/logo.png" alt="Logo" width={40} height={40} />
           ) : (
@@ -26,15 +32,15 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           )}
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
             {isSidebarOpen ? (
-              <X size={20} className="text-slate-700" />
+              <ChevronLeft size={20} className="text-color" />
             ) : (
-              <Menu className="ml-2 text-slate-700" size={20} />
+              <Image src="/icons/logo.png" alt="Logo" width={40} height={40} />
             )}
           </button>
         </div>
 
         {/* Sidebar Navigation */}
-        <SideNav isSidebarOpen={isSidebarOpen} />
+        <SideNav isSidebarOpen={isSidebarOpen} userRole={userRole} />
       </aside>
 
       {/* Main Content Area */}

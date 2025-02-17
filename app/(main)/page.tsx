@@ -1,10 +1,13 @@
 import React from "react";
+import Hero from "./_components/Hero";
+import Category from "./_components/Category";
+import Reviews from "./_components/Reviews";
 
 function Home() {
   return (
-    <div className="h-screen pt-[100px] bg-slate-700">
-      <p className="">Home</p>
-      <div className="h-screen pt-[400px]">Layout</div>
+    <div className="">
+      <Category />
+      <Reviews />
     </div>
   );
 }

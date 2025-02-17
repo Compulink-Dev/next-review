@@ -16,7 +16,23 @@ export const options: NextAuthOptions = {
         await dbConnect();
         if (!credentials) return null;
 
+        console.log("📩 Attempting login with:", credentials.email);
+
         const user = await UserModel.findOne({ email: credentials.email });
+
+        if (!user) {
+          console.log("❌ User not found");
+          return null;
+        }
+
+        const isMatch = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+        if (!isMatch) {
+          console.log("🔑 Password mismatch");
+          return null;
+        }
 
         if (user) {
           const isMatch = await bcrypt.compare(
