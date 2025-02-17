@@ -11,7 +11,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useSession } from "next-auth/react";
 import { Building, LocateFixed, Mail, Phone, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Title from "@/components/Title";
