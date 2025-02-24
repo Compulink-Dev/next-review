@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Title from "@/components/Title";
 import BackButton from "@/components/BackButton";
@@ -32,6 +32,7 @@ function Review() {
   const [review, setReview] = useState<ReviewType | null>(null);
   const [previousReviews, setPreviousReviews] = useState<ReviewType[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchReview = async () => {
@@ -55,7 +56,7 @@ function Review() {
 
   const validateReview = async () => {
     try {
-      await axios.put(`/api/reviews/${id}`);
+      await axios.put(`/api/reviews/${id}`, { valid: true });
       setReview((prev) => prev && { ...prev, valid: true });
     } catch (error) {
       console.error("Failed to validate review:", error);
@@ -67,7 +68,7 @@ function Review() {
 
   // Filter previous reviews for this employee
   const employeeReviews = previousReviews.filter(
-    (prev) => prev.employeeId?._id === review.employeeId?._id
+    (prev) => prev.employeeId?._id === review?.employeeId?._id
   );
 
   // Calculate average rating
@@ -116,7 +117,7 @@ function Review() {
                   variant={"outline"}
                   className="border-color hover:hover-color"
                   onClick={() =>
-                    (window.location.href = `/dashboard/employees/${review.employeeId}`)
+                    router.push(`/dashboard/employees/${review.employeeId}`)
                   }
                 >
                   View Employee
