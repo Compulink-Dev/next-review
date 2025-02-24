@@ -3,29 +3,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { Pen, Plus, Trash } from "lucide-react";
+import { toast } from "react-hot-toast";
 import Title from "@/components/Title";
-import Image from "next/image";
+import EmployeeFormDialog from "../../_components/EmployeeDailog";
+import { DataTable } from "@/components/DataTable"; // Import the reusable DataTable component
+import { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type Employee = {
   _id: string;
@@ -33,152 +18,179 @@ type Employee = {
   email: string;
   phone: string;
   address: string;
-  imageUrl: string;
+  status: string;
 };
 
 const Employees = () => {
   const { data: session } = useSession();
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [open, setOpen] = useState(false);
-  const { register, handleSubmit, reset } = useForm();
+  const [deletingId, setDeletingId] = useState<string | null>(null); // State for confirming deletion
 
-  console.log("Session", session?.user?.role);
-
+  // Fetching employees
   const fetchEmployees = async () => {
     try {
       const res = await axios.get(
-        `/api/company/employees?companyId=${session?.user?.company}`
+        `/api/employees?companyId=${session?.user?.company}`
       );
       setEmployees(res.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
+      toast.error("Failed to fetch employees");
     }
   };
 
+  // Delete employee handler
+  const deleteEmployee = async (id: string) => {
+    try {
+      await axios.delete(`/api/employees/${id}`);
+      toast.success("Employee deleted successfully");
+      fetchEmployees(); // Refresh employee list
+    } catch (error) {
+      toast.error("Failed to delete employee");
+      console.error("Error deleting employee:", error);
+    }
+  };
+
+  // Load employees on session change
   useEffect(() => {
     if (session?.user?.company) fetchEmployees();
   }, [session]);
 
-  const onSubmit = async (data: any) => {
-    try {
-      await axios.post("/api/auth/register/employee", {
-        ...data,
-        companyId: session?.user?.company,
-        role: "employee",
-      });
-      toast.success("Employee added successfully");
-      fetchEmployees(); // Refresh employee list
-      reset();
-      setOpen(false);
-    } catch (error) {
-      console.log(error);
-
-      toast.error("Failed to add employee");
-    }
-  };
+  // Columns for the employee table
+  const employeeColumns: ColumnDef<Employee>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => row.getValue("name"),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => row.getValue("email"),
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone",
+      cell: ({ row }) => row.getValue("phone"),
+    },
+    {
+      accessorKey: "address",
+      header: "Address",
+      cell: ({ row }) => row.getValue("address"),
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("status")}</div>
+      ),
+    },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div className="space-x-2 flex  items-center">
+          <EmployeeFormDialog
+            onSubmitSuccess={fetchEmployees}
+            isEdit={true}
+            defaultValues={row.original}
+            triggerButton={
+              <Button variant="outline" className="border-color text-color">
+                <Pen />
+                <p className="hidden lg:flex">Edit</p>
+              </Button>
+            }
+          />
+          <Button
+            variant="destructive"
+            className="bg-color text-white"
+            onClick={() => setDeletingId(row.original._id)} // Trigger confirmation for deletion
+          >
+            <Trash />
+            <p className="hidden lg:flex">Delete</p>
+          </Button>
+        </div>
+      ),
+      enableSorting: false,
+    },
+  ];
 
   return (
-    <div className="">
+    <div className="-z-20">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <Title title="Employees" subtitle="Manage your employees" />
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="text-color border border-color">
-              <Plus />
-              <p className="">Add Employee</p>
+        <EmployeeFormDialog
+          onSubmitSuccess={fetchEmployees}
+          triggerButton={
+            <Button variant="outline" className="border-color text-color">
+              <Plus /> Add Employee
             </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle>Add employees</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input id="name" {...register("name")} required />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register("email")}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...register("password")}
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full bg-color text-white">
-                Add Employee
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+          }
+        />
       </div>
 
       {/* Employees Table */}
-      <Table>
-        <TableHeader className="rounded-lg">
-          <TableRow className=" bg-color text-white font-bold">
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead>Image</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {employees.length > 0 ? (
-            employees.map((employee) => (
-              <TableRow key={employee._id}>
-                <TableCell>{employee.name}</TableCell>
-                <TableCell>{employee.email}</TableCell>
-                <TableCell>{employee?.phone}</TableCell>
-                <TableCell>{employee?.address}</TableCell>
-                <TableCell>
-                  <Image
-                    src={`${employee?.imageUrl}`}
-                    alt={employee?.name}
-                    width={50}
-                    height={50}
-                  />
-                </TableCell>
-                <TableCell className="space-x-4">
-                  <Button
-                    variant={"outline"}
-                    className="border-color text-color"
-                  >
-                    <Pen />
-                    <p className="">Edit</p>
-                  </Button>
-                  <Button
-                    variant={"destructive"}
-                    className="bg-color text-white"
-                  >
-                    <Trash />
-                    <p className="">Delete</p>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={2} className="text-center py-4">
-                No employees found
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <DataTable<Employee>
+        data={employees}
+        columns={employeeColumns}
+        onRowSelectionChange={(selectedRows) => {
+          console.log("Selected Rows:", selectedRows); // Handle row selection if necessary
+        }}
+      />
+
+      {/* Confirmation Dialog for Deleting */}
+      {deletingId && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg">
+              Are you sure you want to delete this employee?
+            </h3>
+            <div className="flex space-x-4 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setDeletingId(null)} // Cancel deletion
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                className="border-color text-color"
+                onClick={() => {
+                  if (deletingId) {
+                    deleteEmployee(deletingId); // Proceed to delete
+                    setDeletingId(null);
+                  }
+                }}
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

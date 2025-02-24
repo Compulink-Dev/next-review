@@ -10,6 +10,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import CustomFormField, { FormFieldType } from "@/components/CustomFormField";
 import { Form } from "@/components/ui/form"; // ✅ Import Form Provider
+import toast from "react-hot-toast";
 
 type Inputs = {
   email: string;
@@ -47,7 +48,7 @@ const LoginForm = () => {
     });
 
     if (result?.error) {
-      console.error("Login failed:", result.error);
+      toast.error(`Login failed:, ${result.error}`);
     } else {
       // Fetch session after login to check user role
       const updatedSession = await fetch("/api/auth/session").then((res) =>

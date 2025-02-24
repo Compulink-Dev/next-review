@@ -11,12 +11,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Building, LocateFixed, Mail, Phone, Plus } from "lucide-react";
+import { LocateFixed, Mail, Phone, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Title from "@/components/Title";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 
 type Company = {
   _id: string;
@@ -155,9 +156,15 @@ function Company() {
             onClick={() => router.push(`/admin/company/${company._id}`)}
             className="p-8 border cursor-pointer rounded flex bg-slate-50 shadow-lg hover:bg-color hover:text-white items-center gap-4 text-color delay-100"
           >
-            <div className="">
-              <Building size={40} />
-            </div>
+            {company.imageUrl && (
+              <Image
+                src={company.imageUrl}
+                alt="Company Image"
+                width={100}
+                height={100}
+                className="rounded-lg shadow-md"
+              />
+            )}
             <Separator orientation="vertical" className="bg-red-700" />
             <div className="">
               <p className="font-bold">{company.name}</p>

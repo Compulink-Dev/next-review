@@ -1,17 +1,40 @@
+//@ts-nocheck
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/database";
 import UserModel from "@/lib/models/User";
-import bcrypt from "bcryptjs"; // Ensure passwords are hashed before storing
 import { getServerSession } from "next-auth";
-import { options } from "../auth/[...nextauth]/options";
-import Company from "@/lib/models/Company";
+import { options } from "../../auth/[...nextauth]/options";
 
 export async function GET(req: Request) {
   await dbConnect();
-  const session = await getServerSession(options);
 
-  if (!session) {
+  // Extract the ID from the URL manually
+  const url = new URL(req.url);
+  const employeeId = url.pathname.split("/").pop(); // Get the last segment of the path
+
+  const session = await getServerSession(options);
+  if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (employeeId) {
+    // Fetch single employee by ID
+    try {
+      const employee = await UserModel.findById(employeeId);
+      if (!employee) {
+        return NextResponse.json(
+          { error: "Employee not found" },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ employee }, { status: 200 });
+    } catch (error) {
+      console.log(error);
+
+      return NextResponse.json(
+        { error: "Failed to fetch employee" },
+        { status: 500 }
+      );
+    }
   }
 
   const { searchParams } = new URL(req.url);
@@ -29,9 +52,9 @@ export async function GET(req: Request) {
 
   try {
     const employees = await UserModel.find({ company: companyId });
-    return NextResponse.json(employees, { status: 200 });
+    return NextResponse.json(employees);
   } catch (error) {
-    console.error("Error fetching employees:", error);
+    console.log(error);
     return NextResponse.json(
       { error: "Failed to fetch employees" },
       { status: 500 }
@@ -39,54 +62,13 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
-  await dbConnect();
-  const session = await getServerSession(options);
-
-  if (!session || session.user.role !== "companyAdmin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const { name, email, phone, address, password, companyId, status } =
-      await req.json();
-
-    if (!name || !email || !password || !companyId) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newEmployee = await UserModel.create({
-      name,
-      email,
-      phone,
-      address,
-      password: hashedPassword,
-      company: companyId,
-      role: "employee",
-      status,
-    });
-
-    await Company.findByIdAndUpdate(companyId, {
-      $push: { employees: newEmployee._id },
-    });
-
-    return NextResponse.json(newEmployee, { status: 201 });
-  } catch (error) {
-    console.error("Error creating employee:", error);
-    return NextResponse.json(
-      { error: "Failed to create employee" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function PUT(req: Request) {
   await dbConnect();
+
+  // Extract the ID from the URL manually
+  const url = new URL(req.url);
+  const employeeId = url.pathname.split("/").pop(); // Get the last segment of the path
+
   const session = await getServerSession(options);
 
   if (!session || session.user.role !== "companyAdmin") {
@@ -94,10 +76,12 @@ export async function PUT(req: Request) {
   }
 
   try {
-    const { id, ...updates } = await req.json();
-    const updatedEmployee = await UserModel.findByIdAndUpdate(id, updates, {
-      new: true,
-    });
+    const updates = await req.json();
+    const updatedEmployee = await UserModel.findByIdAndUpdate(
+      employeeId,
+      updates,
+      { new: true }
+    );
 
     if (!updatedEmployee) {
       return NextResponse.json(
@@ -108,7 +92,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(updatedEmployee, { status: 200 });
   } catch (error) {
-    console.error("Error updating employee:", error);
+    console.log(error);
     return NextResponse.json(
       { error: "Failed to update employee" },
       { status: 500 }
@@ -118,6 +102,10 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
   await dbConnect();
+
+  // Extract the ID from the URL manually
+  const url = new URL(req.url);
+  const employeeId = url.pathname.split("/").pop(); // Get the last segment of the path
   const session = await getServerSession(options);
 
   if (!session || session.user.role !== "companyAdmin") {
@@ -125,8 +113,7 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    const { id } = await req.json();
-    const deletedEmployee = await UserModel.findByIdAndDelete(id);
+    const deletedEmployee = await UserModel.findByIdAndDelete(employeeId);
 
     if (!deletedEmployee) {
       return NextResponse.json(
@@ -137,7 +124,7 @@ export async function DELETE(req: Request) {
 
     return NextResponse.json({ message: "Employee deleted" }, { status: 200 });
   } catch (error) {
-    console.error("Error deleting employee:", error);
+    console.log(error);
     return NextResponse.json(
       { error: "Failed to delete employee" },
       { status: 500 }

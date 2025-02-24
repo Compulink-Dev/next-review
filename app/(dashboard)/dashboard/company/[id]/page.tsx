@@ -6,7 +6,10 @@ import axios from "axios";
 import Title from "@/components/Title";
 import BackButton from "@/components/BackButton";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import Loading from "@/components/Loading";
+import { useSession } from "next-auth/react";
+import ReviewModal from "@/components/ReviewModal";
+import ViewModal from "@/components/ViewModal";
 
 type Company = {
   _id: string;
@@ -31,6 +34,7 @@ function CompanyDetails() {
   const [company, setCompany] = useState<Company | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -44,12 +48,15 @@ function CompanyDetails() {
         setLoading(false);
       }
     };
-
     if (id) fetchCompany();
   }, [id]);
 
-  if (loading) return <p>Loading company details...</p>;
+  if (loading) return <Loading />;
   if (!company) return <p>No company found.</p>;
+
+  console.log("Employees :", employees);
+
+  console.log(company);
 
   return (
     <div>
@@ -108,10 +115,10 @@ function CompanyDetails() {
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline">View</Button>
-                  <Button className="border border-color text-color hover:hover-color">
-                    Review
-                  </Button>
+                  <ViewModal employeeId={emp._id} />
+                  {session?.user.role === "client" && (
+                    <ReviewModal employeeId={emp._id} />
+                  )}
                 </div>
               </li>
             ))}
@@ -123,5 +130,4 @@ function CompanyDetails() {
     </div>
   );
 }
-
 export default CompanyDetails;

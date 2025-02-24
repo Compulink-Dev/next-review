@@ -6,12 +6,19 @@ import Image from "next/image";
 import Header from "../_components/Header";
 import SideNav from "../_components/SideNav";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { data: session } = useSession(); // Get session data
 
+  const router = useRouter();
+
   console.log("Session : ", session);
+
+  if (!session) {
+    return router.push("/signin");
+  }
 
   const userRole = session?.user?.role ?? "client"; // Default to client if undefined
 

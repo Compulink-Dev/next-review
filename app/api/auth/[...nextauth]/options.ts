@@ -25,6 +25,12 @@ export const options: NextAuthOptions = {
           return null;
         }
 
+        if (user.role === "employee" && user.status === "inactive") {
+          throw new Error(
+            "Your account is inactive. Please contact your company administrator."
+          );
+        }
+
         const isMatch = await bcrypt.compare(
           credentials.password,
           user.password

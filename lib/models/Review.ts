@@ -1,13 +1,21 @@
 import mongoose from "mongoose";
 
-// Review Model
 const ReviewSchema = new mongoose.Schema({
-  employeeName: { type: String, required: true },
+  employeeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  clientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   department: { type: String, required: true },
-  clientName: { type: String, required: true },
   date: { type: Date, default: Date.now },
   rating: { type: Number, required: true, min: 1, max: 5 },
   description: { type: String, required: true },
+  valid: { type: Boolean, default: false }, // New field with default value
 });
 
 export const Review =

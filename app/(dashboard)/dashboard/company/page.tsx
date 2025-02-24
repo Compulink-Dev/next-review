@@ -12,11 +12,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
-import { Building, Plus } from "lucide-react";
+import { LocateFixed, Mail, Phone, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Title from "@/components/Title";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 
 // Company and Employee Types
 type Company = {
@@ -118,17 +119,35 @@ function Company() {
           <div
             key={company._id}
             onClick={() => router.push(`/dashboard/company/${company._id}`)}
-            className="p-4 border rounded cursor-pointer bg-slate-50 hover:bg-color hover:text-white transition"
+            className="p-8 border cursor-pointer rounded flex bg-slate-50 shadow-lg hover:bg-color hover:text-white items-center gap-4 text-color delay-100"
           >
-            <div className="flex gap-4 items-center">
-              <Building size={40} />
-              <Separator orientation="vertical" />
-              <div>
-                <p className="font-bold">{company.name}</p>
-                <p className="text-xs mt-2">{company.phone}</p>
-                <p className="text-xs">{company.email}</p>
-                <p className="text-xs">{company.website}</p>
-                <p className="text-xs">{company.address}</p>
+            {company.imageUrl && (
+              <Image
+                src={company.imageUrl}
+                alt="Company Image"
+                width={100}
+                height={100}
+                className="rounded-lg shadow-md"
+              />
+            )}
+            <Separator orientation="vertical" className="bg-red-700" />
+            <div className="">
+              <p className="font-bold">{company.name}</p>
+              <p className="text-xs">{company.service}</p>
+
+              <div className="mt-4 space-y-2">
+                <div className="flex gap-2 items-center">
+                  <Phone size={12} />
+                  <p className="text-xs">{company.phone}</p>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <Mail size={12} />
+                  <p className="text-xs">{company.email}</p>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <LocateFixed size={12} />
+                  <p className="text-xs">{company.address}</p>
+                </div>
               </div>
             </div>
           </div>
