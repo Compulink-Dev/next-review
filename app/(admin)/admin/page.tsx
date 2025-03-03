@@ -1,30 +1,61 @@
-import { options } from "@/app/api/auth/[...nextauth]/options";
+"use client";
+
+import { FC, useEffect, useState } from "react";
+import DetailsCard from "../_components/DetailsCard";
+import ReviewChart from "../_components/ReviewChart";
+import UserChart from "../_components/UserChart"; // Ensure this component exists
+import { FileStack, Hospital, User } from "lucide-react";
 import Title from "@/components/Title";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 
-const Dashboard = async () => {
-  const session = await getServerSession(options);
+const Dashboard: FC = () => {
+  const [data, setData] = useState<{
+    reviews: number;
+    companies: number;
+    users: number;
+    reviewChartData: { date: string; count: number }[];
+    userChartData: { date: string; count: number }[];
+  } | null>(null);
 
-  // Redirect if there is no session or if the user's role is not admin
-  if (!session || session.user?.role !== "admin") {
-    redirect("/signin");
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/dashboard");
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (!data) return <p>Loading...</p>;
 
   return (
-    <div className="">
-      <Title
-        title="Dashboard"
-        subtitle="Here is where you can manage your settings and view insights"
-      />
+    <div className=" py-6 sm:px-6 lg:px-8">
+      <Title title="Dashboard" />
+      <div className="grid grid-cols-1 gap-4 mt-6 sm:grid-cols-2 lg:grid-cols-3">
+        <DetailsCard
+          title="Reviews"
+          value={data.reviews}
+          icon={<FileStack size={60} />}
+        />
+        <DetailsCard
+          title="Companies"
+          value={data.companies}
+          icon={<Hospital size={60} />}
+        />
+        <DetailsCard
+          title="Users"
+          value={data.users}
+          icon={<User size={60} />}
+        />
+      </div>
 
-      {/* Example Long Content for Scrolling */}
-      <div className="mt-4 space-y-6">
-        {Array.from({ length: 20 }, (_, i) => (
-          <div key={i} className="p-4 bg-white shadow-md rounded-lg">
-            Content Block {i + 1}
-          </div>
-        ))}
+      <div className="grid grid-cols-1 gap-4 mt-6 sm:grid-cols-2">
+        <ReviewChart data={data.reviewChartData} />
+        <UserChart data={data.userChartData} />
       </div>
     </div>
   );

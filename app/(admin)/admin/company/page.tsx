@@ -11,30 +11,41 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useSession } from "next-auth/react";
 import { LocateFixed, Mail, Phone, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Title from "@/components/Title";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/DataTable";
 
+// Company Type
 type Company = {
   _id: string;
   name: string;
   email: string;
-  website?: string;
+  service?: string | string[];
   phone?: string;
-  imageUrl?: string;
-  service?: string[];
   address?: string;
-  category?: string[];
   description?: string;
+  website?: string;
+  category?: string | string[];
+  imageUrl?: string;
 };
 
+// DataTable Columns
+const columns: ColumnDef<Company>[] = [
+  { accessorKey: "name", header: "Company Name" },
+  { accessorKey: "email", header: "Email" },
+  { accessorKey: "phone", header: "Phone" },
+  { accessorKey: "address", header: "Address" },
+];
+
 function Company() {
+  const { data: session } = useSession();
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [open, setOpen] = useState(false);
   const router = useRouter();
   const { register, handleSubmit, reset } = useForm();
 
@@ -42,7 +53,7 @@ function Company() {
     const fetchCompanies = async () => {
       try {
         const res = await axios.get("/api/company");
-        setCompanies(res.data);
+        setCompanies(res.data.companies || res.data);
       } catch (error) {
         console.error("Error fetching companies:", error);
       }
@@ -54,103 +65,64 @@ function Company() {
     try {
       const res = await axios.post("/api/auth/register/company", data);
       if (res.status === 201) {
-        setOpen(false);
+        setCompanies((prev) => [...prev, res.data.company]);
         reset();
-        setCompanies((prev: Company[]) => [...prev, res.data.company]);
       }
     } catch (error) {
       console.error("Failed to add company:", error);
     }
   };
 
-  console.log("Companies : ", companies);
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <Title
           title="Companies"
-          subtitle="View all the companies on this platform"
+          subtitle="View all companies on this platform"
         />
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="text-color border border-color">
-              <Plus />
-              <p className="ml-2">Add Company</p>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle>Add Company</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="flex gap-2 items-center">
-                <div className="w-full">
-                  <Label htmlFor="name">Company Name</Label>
-                  <Input id="name" {...register("name", { required: true })} />
-                </div>
-                <div className="w-full">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    {...register("email", { required: true })}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...register("password", { required: true })}
-                />
-              </div>
-              <div className="flex gap-2 items-center">
-                <div className="w-full">
-                  <Label htmlFor="website">Website</Label>
-                  <Input id="website" {...register("website")} />
-                </div>
-                <div className="w-full">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" {...register("phone")} />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-full">
-                  <Label htmlFor="imageUrl">Image URL</Label>
-                  <Input id="imageUrl" {...register("imageUrl")} />
-                </div>
-                <div className="w-full">
-                  <Label htmlFor="service">Service</Label>
-                  <Input id="service" {...register("service")} />
-                </div>
-              </div>
-              <div className="flex gap-2 items-center w-full">
-                <div className="w-full">
-                  <Label htmlFor="address">Address</Label>
-                  <Input id="address" {...register("address")} />
-                </div>
-                <div className="w-full">
-                  <Label htmlFor="category">Category</Label>
-                  <Input id="category" {...register("category")} />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Input id="description" {...register("description")} />
-              </div>
-
-              <Button type="submit" className="w-full bg-color text-white">
-                Add Company
+        {session?.user.role === "admin" && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2" /> Add Company
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Company</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Input
+                  {...register("name", { required: true })}
+                  placeholder="Company Name"
+                />
+                <Input
+                  {...register("email", { required: true })}
+                  placeholder="Email"
+                  type="email"
+                />
+                <Input
+                  {...register("password", { required: true })}
+                  placeholder="Password"
+                  type="password"
+                />
+                <Input {...register("website")} placeholder="Website" />
+                <Input {...register("phone")} placeholder="Phone" />
+                <Input {...register("imageUrl")} placeholder="Image URL" />
+                <Input {...register("service")} placeholder="Service" />
+                <Input {...register("address")} placeholder="Address" />
+                <Input {...register("category")} placeholder="Category" />
+                <Input {...register("description")} placeholder="Description" />
+                <Button type="submit">Add Company</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
-      <Title title="All Companies" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        {companies.map((company) => (
+
+      {/* Display First 3 Companies as Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {companies.slice(0, 3).map((company) => (
           <div
             key={company._id}
             onClick={() => router.push(`/admin/company/${company._id}`)}
@@ -166,10 +138,9 @@ function Company() {
               />
             )}
             <Separator orientation="vertical" className="bg-red-700" />
-            <div className="">
+            <div>
               <p className="font-bold">{company.name}</p>
               <p className="text-xs">{company.service}</p>
-
               <div className="mt-4 space-y-2">
                 <div className="flex gap-2 items-center">
                   <Phone size={12} />
@@ -188,6 +159,11 @@ function Company() {
           </div>
         ))}
       </div>
+
+      {/* Display Remaining Companies in DataTable */}
+      {companies.length > 1 && (
+        <DataTable filter="name" columns={columns} data={companies.slice(3)} />
+      )}
     </div>
   );
 }

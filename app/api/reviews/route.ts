@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import dbConnect from "@/lib/database";
 import { options } from "../auth/[...nextauth]/options";
 import { Review } from "@/lib/models/Review";
+import Notification from "@/lib/models/Notifications";
 
 export async function POST(req: Request) {
   await dbConnect();
@@ -31,6 +32,13 @@ export async function POST(req: Request) {
       valid: false, // Ensure valid starts as false
     });
 
+    // Create notification
+    await Notification.create({
+      type: "review",
+      message: `New review added for employee ${employeeId}`,
+      relatedId: review._id,
+    });
+
     return NextResponse.json(review, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -52,8 +60,13 @@ export async function GET() {
 
   try {
     let reviews;
-
-    if (session.user.role === "companyAdmin") {
+    if (session.user.role === "admin") {
+      // Admin gets ALL reviews
+      reviews = await Review.find()
+        .populate("employeeId", "_id name email role company")
+        .populate("clientId", "_id name email")
+        .lean();
+    } else if (session.user.role === "companyAdmin") {
       // Fetch all reviews for employees under the company
       reviews = await Review.find()
         .populate({

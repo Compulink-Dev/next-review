@@ -1,17 +1,5 @@
 // models/User.ts
-import mongoose, { Schema, Document } from "mongoose";
-
-interface IUser extends Document {
-  name: string;
-  email: string;
-  password: string;
-  role: "client" | "companyAdmin" | "employee";
-  company?: mongoose.Types.ObjectId;
-  phone?: string;
-  address?: string;
-  imageUrl?: string;
-  status?: string;
-}
+import mongoose, { Schema } from "mongoose";
 
 const UserSchema: Schema = new Schema(
   {
@@ -31,7 +19,6 @@ const UserSchema: Schema = new Schema(
   },
   { timestamps: true }
 );
-const UserModel =
-  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+const UserModel = mongoose.models?.User || mongoose.model("User", UserSchema);
 
 export default UserModel;

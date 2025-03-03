@@ -18,20 +18,30 @@ import Title from "@/components/Title";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/DataTable";
 
-// Company and Employee Types
+// Company Type
 type Company = {
   _id: string;
   name: string;
   email: string;
-  service?: string | string[]; // Accept both string and array
+  service?: string | string[];
   phone?: string;
   address?: string;
   description?: string;
   website?: string;
-  category?: string | string[]; // Accept both string and array
+  category?: string | string[];
   imageUrl?: string;
 };
+
+// DataTable Columns
+const columns: ColumnDef<Company>[] = [
+  { accessorKey: "name", header: "Company Name" },
+  { accessorKey: "email", header: "Email" },
+  { accessorKey: "phone", header: "Phone" },
+  { accessorKey: "address", header: "Address" },
+];
 
 function Company() {
   const { data: session } = useSession();
@@ -43,7 +53,6 @@ function Company() {
     const fetchCompanies = async () => {
       try {
         const res = await axios.get("/api/company");
-        // Adjusting for API response structure
         setCompanies(res.data.companies || res.data);
       } catch (error) {
         console.error("Error fetching companies:", error);
@@ -64,8 +73,6 @@ function Company() {
     }
   };
 
-  console.log("companies", companies);
-
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -77,8 +84,7 @@ function Company() {
           <Dialog>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2" />
-                Add Company
+                <Plus className="mr-2" /> Add Company
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -114,8 +120,9 @@ function Company() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {companies.map((company) => (
+      {/* Display First 3 Companies as Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {companies.slice(0, 3).map((company) => (
           <div
             key={company._id}
             onClick={() => router.push(`/dashboard/company/${company._id}`)}
@@ -131,10 +138,9 @@ function Company() {
               />
             )}
             <Separator orientation="vertical" className="bg-red-700" />
-            <div className="">
+            <div>
               <p className="font-bold">{company.name}</p>
               <p className="text-xs">{company.service}</p>
-
               <div className="mt-4 space-y-2">
                 <div className="flex gap-2 items-center">
                   <Phone size={12} />
@@ -153,6 +159,11 @@ function Company() {
           </div>
         ))}
       </div>
+
+      {/* Display Remaining Companies in DataTable */}
+      {companies.length > 1 && (
+        <DataTable filter="name" columns={columns} data={companies.slice(3)} />
+      )}
     </div>
   );
 }

@@ -125,6 +125,7 @@ const Users = () => {
       {/* Users Table */}
       <DataTable<User>
         data={users}
+        filter="email"
         columns={userColumns}
         onRowSelectionChange={(selectedRows) => {
           console.log("Selected Rows:", selectedRows); // Handle row selection if necessary

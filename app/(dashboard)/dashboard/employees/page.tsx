@@ -117,15 +117,18 @@ const Employees = () => {
             isEdit={true}
             defaultValues={row.original}
             triggerButton={
-              <Button variant="outline" className="border-color text-color">
+              <Button
+                variant="outline"
+                className="border-color text-color hover:bg-hover"
+              >
                 <Pen />
                 <p className="hidden lg:flex">Edit</p>
               </Button>
             }
           />
           <Button
-            variant="destructive"
-            className="bg-color text-white"
+            variant="outline"
+            className="bg-color text-white hover:hover-color"
             onClick={() => setDeletingId(row.original._id)} // Trigger confirmation for deletion
           >
             <Trash />
@@ -154,6 +157,7 @@ const Employees = () => {
 
       {/* Employees Table */}
       <DataTable<Employee>
+        filter={"name"}
         data={employees}
         columns={employeeColumns}
         onRowSelectionChange={(selectedRows) => {

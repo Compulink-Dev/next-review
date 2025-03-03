@@ -37,8 +37,8 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         _id: review._id,
-        clientName: review.clientId?.name, // Extract client name
-        employeeName: review.employeeId?.name, // Extract employee name
+        clientName: review.clientId?.name,
+        employeeId: review.employeeId, // ✅ Send the full employeeId object
         date: review.date,
         department: review.department,
         rating: review.rating,

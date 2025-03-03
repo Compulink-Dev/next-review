@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,19 +19,36 @@ import { Input } from "@/components/ui/input";
 import { Bell, Mail } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Header = ({ isSidebarOpen }: { isSidebarOpen: any }) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [showDialog, setShowDialog] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]); // Store notifications
+  const [notificationCount, setNotificationCount] = useState(0); // Store the count of notifications
+
+  // Fetch notifications from the server
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch("/api/notifications"); // Adjust the API path if needed
+        const data = await response.json();
+        setNotifications(data);
+        setNotificationCount(data.length); // Update the notification count
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+    fetchNotifications();
+  }, []); // Empty dependency array ensures this runs once when the component mounts
 
   // Generate user initials from the session
   const getUserInitials = () => {
     if (session?.user?.name) {
       const nameParts = session.user.name.split(" ");
       const initials = nameParts
-        .map((part: string) => part[0].toUpperCase()) // Explicitly typing `part` as string
+        .map((part: string) => part[0].toUpperCase())
         .join("");
       return initials;
     }
@@ -93,7 +108,7 @@ const Header = ({ isSidebarOpen }: { isSidebarOpen: any }) => {
             <Button variant="ghost" className="relative">
               <Bell className="h-6 w-6 text-color" />
               <span className="absolute -top-1 -right-1 bg-color text-white text-xs px-1.5 py-0.5 rounded-full">
-                5
+                {notificationCount} {/* Display notification count */}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -101,8 +116,15 @@ const Header = ({ isSidebarOpen }: { isSidebarOpen: any }) => {
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>New comment on your post</DropdownMenuItem>
-              <DropdownMenuItem>System update available</DropdownMenuItem>
+              {notifications.length > 0 ? (
+                notifications.map((notification: any, index: number) => (
+                  <DropdownMenuItem key={index}>
+                    {notification.message}
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem>No new notifications</DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 className="cursor-pointer"
                 onClick={() => router.push("/dashboard/notifications")}

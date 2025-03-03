@@ -54,7 +54,10 @@
   }
 
   .hover-color {
+    background-color: transparent;
     color: #b22222;
+    border: #b22222;
+    border-width: 1;
     border-color: #b22222;
   }
 

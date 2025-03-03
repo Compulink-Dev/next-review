@@ -9,6 +9,8 @@ import Title from "@/components/Title";
 import { Separator } from "@/components/ui/separator";
 import { useSession } from "next-auth/react";
 import Loading from "@/components/Loading";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/DataTable";
 
 type Review = {
   _id: string;
@@ -35,7 +37,6 @@ function Reviews() {
     const fetchReviews = async () => {
       try {
         const res = await axios.get("/api/reviews");
-        console.log("Reviews :", res.data);
         setReviews(res.data);
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -48,6 +49,61 @@ function Reviews() {
 
   if (loading) return <Loading />;
 
+  // Show only the latest 3 reviews
+  const latestReviews = reviews.slice(0, 3);
+  // The rest will be displayed in the DataTable
+  const remainingReviews = reviews.slice(3);
+
+  // Table columns
+  const columns: ColumnDef<Review>[] = [
+    {
+      accessorKey: "employeeId.name",
+      header: "Employee",
+      cell: ({ row }) => <p>{row.original.employeeId.name}</p>,
+    },
+    {
+      accessorKey: "department",
+      header: "Department",
+    },
+    {
+      accessorKey: "clientId.name",
+      header: "Client",
+      cell: ({ row }) => <p>{row.original.clientId.name}</p>,
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }) => (
+        <p>{new Date(row.original.date).toLocaleDateString()}</p>
+      ),
+    },
+    {
+      accessorKey: "rating",
+      header: "Rating",
+      cell: ({ row }) => (
+        <div className="flex gap-1">
+          {[...Array(row.original.rating)].map((_, i) => (
+            <Star key={i} size={14} className="text-yellow-500" />
+          ))}
+          {[...Array(5 - row.original.rating)].map((_, i) => (
+            <Star key={`empty-${i}`} size={14} className="text-gray-300" />
+          ))}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "valid",
+      header: "Status",
+      cell: ({ row }) => (
+        <span
+          className={row.original.valid ? "text-green-600" : "text-red-600"}
+        >
+          {row.original.valid ? "Validated" : "Pending"}
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -55,7 +111,6 @@ function Reviews() {
           title="Reviews"
           subtitle="Manage and view reviews on this platform"
         />
-
         {session?.user.role !== "employee" && (
           <Button
             onClick={() => router.push("/dashboard/company")}
@@ -68,12 +123,10 @@ function Reviews() {
         )}
       </div>
 
-      {/* Show message if there are no reviews */}
-      {reviews.length === 0 ? (
-        <p className="text-center text-gray-500 mt-6">No reviews available.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          {reviews.map((review, index) => (
+      {/* Show Latest 3 Reviews */}
+      {latestReviews.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {latestReviews.map((review, index) => (
             <div
               key={index}
               onClick={() => router.push(`/dashboard/reviews/${review._id}`)}
@@ -115,6 +168,18 @@ function Reviews() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* DataTable for Remaining Reviews */}
+      {remainingReviews.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-4">All Reviews</h3>
+          <DataTable
+            filter="department"
+            data={remainingReviews}
+            columns={columns}
+          />
         </div>
       )}
     </div>

@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Loading from "@/components/Loading";
+import ViewButton from "@/app/(dashboard)/_components/ViewButton";
 
 interface ViewModalProps {
   employeeId: string;
@@ -83,6 +84,9 @@ function ViewModal({ employeeId }: ViewModalProps) {
                 <p>{employee.position}</p>
               </div>
             )}
+            <div className="">
+              <ViewButton id={employeeId} />
+            </div>
             <h3 className="font-semibold mt-4">Reviews</h3>
             {reviews.length > 0 ? (
               <ul className="space-y-2 max-h-40 overflow-y-auto">

@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import ViewButton from "./ViewButton";
 
 interface EmployeeFormDialogProps {
   onSubmitSuccess: () => void;
@@ -81,15 +82,17 @@ const EmployeeFormDialog: React.FC<EmployeeFormDialogProps> = ({
             <Label htmlFor="address">Address</Label>
             <Input id="address" {...register("address")} required />
           </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              {...register("password")}
-              required
-            />
-          </div>
+          {!isEdit && (
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                {...register("password")}
+                required
+              />
+            </div>
+          )}
           {isEdit && (
             <div className="">
               <div>
@@ -98,10 +101,14 @@ const EmployeeFormDialog: React.FC<EmployeeFormDialogProps> = ({
               </div>
             </div>
           )}
-          <Button type="submit" className="w-full bg-color text-white">
+          <Button
+            type="submit"
+            className="w-full bg-color border text-white hover:hover-color"
+          >
             {isEdit ? "Update Employee" : "Add Employee"}
           </Button>
         </form>
+        {isEdit && <ViewButton id={defaultValues._id} />}
       </DialogContent>
     </Dialog>
   );

@@ -34,12 +34,14 @@ import {
 type DataTableProps<T> = {
   data: T[];
   columns: ColumnDef<T>[];
+  filter: string;
   onRowSelectionChange?: (selectedRows: Record<string, boolean>) => void;
 };
 
 export function DataTable<T>({
   data,
   columns,
+  filter,
   onRowSelectionChange,
 }: DataTableProps<T>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -80,9 +82,11 @@ export function DataTable<T>({
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn(`${filter}`)?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn(`${filter}`)?.setFilterValue(event.target.value)
           }
           className="max-w-sm border-color text-color outline-none placeholder:text-color"
         />
