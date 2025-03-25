@@ -31,28 +31,28 @@ function Header() {
           : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between p-4">
+      <div className="container mx-auto flex items-center justify-between px-4 py-2">
         {/* Logo */}
         <Link href="/">
-          <Image src="/icons/logo.png" alt="Logo" width={50} height={40} />
+          <Image src="/icons/logo.png" alt="Logo" width={30} height={30} />
         </Link>
 
         {/* Navigation Links */}
         <nav>
           <ul className="flex items-center space-x-6 text-xs">
-            <li>
-              <Link href="/" className="text-white hover:text-red-600">
-                Home
+          <li>
+              <Link href="/companies" className="text-white hover:text-red-600">
+                Companies
               </Link>
             </li>
             <li>
-              <Link href="/about" className="text-white hover:text-red-600">
-                About
+              <Link href="/categories" className="text-white hover:text-red-600">
+                Categories
               </Link>
             </li>
             <li>
-              <Link href="/services" className="text-white hover:text-red-600">
-                Services
+              <Link href="/employees" className="text-white hover:text-red-600">
+                Employees
               </Link>
             </li>
             <li>
@@ -61,25 +61,15 @@ function Header() {
               </Link>
             </li>
             <div className="flex items-center gap-2">
-              <li>
-                <Button
-                  variant={"outline"}
-                  className="border-red-600 hover:bg-color text-white"
-                  onClick={() => {
-                    router.push("/signin");
-                  }}
-                >
-                  Login
-                </Button>
-              </li>
+          
               <li>
                 <Button
                   className="bg-color hover:bg-red-600 text-white"
                   onClick={() => {
-                    router.push("/register");
+                    router.push("/signin");
                   }}
                 >
-                  Register
+                  Get Started
                 </Button>
               </li>
             </div>

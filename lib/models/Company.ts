@@ -10,7 +10,7 @@ const CompanySchema = new mongoose.Schema({
   phone: { type: String, required: true },
   imageUrl: { type: String, required: true },
   service: { type: String, required: true },
-  category: { type: String, required: true },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
   address: { type: String, required: true },
   description: { type: String, required: true },
 });

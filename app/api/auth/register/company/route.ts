@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 import dbConnect from "@/lib/database";
 import UserModel from "@/lib/models/User";
 import Company from "@/lib/models/Company";
+import Category from "@/lib/models/Category";
 
 // POST: Create a new company
 export async function POST(req: Request) {
@@ -15,11 +16,22 @@ export async function POST(req: Request) {
       website,
       phone,
       address,
-      category,
+      categoryId, // Now expecting categoryId instead of category string
       description,
       imageUrl,
       service,
     } = await req.json();
+
+
+      // Check if category exists
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        return NextResponse.json(
+          { message: "Category not found" },
+          { status: 404 }
+        );
+      }
+  
 
     const existingUser = await UserModel.findOne({ email });
     if (existingUser)
@@ -46,11 +58,17 @@ export async function POST(req: Request) {
       phone,
       imageUrl,
       service,
-      category,
+      category: categoryId, // Store the category reference
       address,
       description,
       admin: user._id,
     });
+
+       // Add company to category's companies array
+       await Category.findByIdAndUpdate(categoryId, {
+        $push: { companies: company._id },
+      });
+  
 
     console.log("Company : ", company);
 
