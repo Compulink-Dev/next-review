@@ -109,7 +109,7 @@ export default function CategoryList() {
                   </div>
                 </CardContent>
                 <CardContent>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full bg-color hover:bg-red-600 text-white">
                     View Companies
                   </Button>
                 </CardContent>

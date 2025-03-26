@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Eye, Star, MoreVertical } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -15,6 +15,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 interface Company {
   _id: string
@@ -205,6 +211,7 @@ export default function CompanyDetails() {
                           <TableHead>Email</TableHead>
                           <TableHead>Position</TableHead>
                           <TableHead>Department</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -220,6 +227,31 @@ export default function CompanyDetails() {
                             <TableCell>
                               {employee.department || '-'}
                             </TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="bg-white">
+                                  <DropdownMenuItem
+                                    onClick={() => router.push(`/employees/${employee._id}`)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                    View
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => router.push(`/employees/${employee._id}/reviews`)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    <Star className="h-4 w-4" />
+                                    Review
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -228,17 +260,6 @@ export default function CompanyDetails() {
                 ) : (
                   <p className="text-muted-foreground">No employees found</p>
                 )}
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <Button
-                  onClick={() => router.push(`/companies/${company._id}/edit`)}
-                >
-                  Edit Company
-                </Button>
-                <Button variant="outline" className="text-red-600">
-                  Delete Company
-                </Button>
               </div>
             </CardContent>
           </Card>

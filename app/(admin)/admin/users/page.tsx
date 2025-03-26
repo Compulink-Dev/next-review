@@ -87,20 +87,19 @@ const Users = () => {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="space-x-4">
+        <div className="space-x-1">
           <EmployeeFormDialog
             onSubmitSuccess={fetchUsers}
             isEdit={true}
             defaultValues={row.original}
             triggerButton={
-              <Button variant="outline" className="border-color text-color">
-                <Pen /> Edit
+              <Button variant="outline" className="border-color text-color hover:bg-white">
+                <Pen /> 
               </Button>
             }
           />
           <Button variant={"destructive"} className="bg-color text-white">
             <Trash />
-            <p>Delete</p>
           </Button>
         </div>
       ),

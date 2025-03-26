@@ -150,24 +150,24 @@ export default function Employees() {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className='bg-white'>
                         <DropdownMenuItem
                           onClick={() =>
-                            router.push(`/admin/employees/${employee._id}`)
+                            router.push(`/employees/${employee._id}`)
                           }
                         >
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem
+                        {/* <DropdownMenuItem
                           onClick={() =>
-                            router.push(`/admin/employees/${employee._id}/edit`)
+                            router.push(`/employees/${employee._id}/edit`)
                           }
                         >
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-red-600">
                           Delete
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

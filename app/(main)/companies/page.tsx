@@ -58,7 +58,7 @@ export default function Companies() {
   }, [])
 
   const filteredCompanies = companies.filter(company =>
-    company.name.toLowerCase().includes(searchTerm.toLowerCase())
+    company.name.toLowerCase().includes(searchTerm.toLowerCase()) || []
   )
 
   if (loading) {
@@ -155,23 +155,13 @@ export default function Companies() {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className='bg-white'>
                         <DropdownMenuItem
                           onClick={() =>
-                            router.push(`/admin/companies/${company._id}`)
+                            router.push(`/companies/${company._id}`)
                           }
                         >
                           View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            router.push(`/admin/companies/${company._id}/edit`)
-                          }
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
